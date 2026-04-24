@@ -206,3 +206,41 @@ with col5:
     )
 
 st.markdown("---")
+
+# Section 2 — Choropeth Map (Global ANS Distribution)
+
+st.subheader(f"🗺️ Visualisation 1: Global ANS Distribution — {selected_year}")
+
+fig_map = px.choropleth(
+    year_data,
+    locations="Country Code",
+    color="ANS",
+    hover_name="Country Name",
+    hover_data={"ANS": ":.2f", "Country Code": False},
+    color_continuous_scale="RdYlGn",
+    color_continuous_midpoint=0,
+    range_color=[-35, 40],
+    title=f"Adjusted Net Savings (% of GNI) — {selected_year}",
+    labels={"ANS": "ANS (% of GNI)"}
+)
+fig_map.update_layout(
+    height=520,
+    margin=dict(l=0, r=0, t=40, b=0),
+    coloraxis_colorbar=dict(
+        title="ANS % of GNI",
+        tickvals=[-30, -20, -10, 0, 10, 20, 30, 40],
+        ticktext=["-30%", "-20%", "-10%", "0%", "+10%", "+20%", "+30%", "+40%"]
+    ),
+    geo=dict(showframe=False, showcoastlines=True, projection_type="natural earth")
+)
+st.plotly_chart(fig_map, width='stretch')
+
+st.markdown(
+    '<div class="insight-box">🔍 <b>Key Insight:</b> Red/orange countries are consuming more '
+    'wealth than they are creating — depleting natural resources faster than building human capital. '
+    'Green countries are investing in education and clean infrastructure. '
+    'Use the year slider to observe how the global picture has changed since 1990.</div>',
+    unsafe_allow_html=True
+)
+
+st.markdown("---")
