@@ -108,3 +108,101 @@ def load_data():
 
 # Load the data
 df = load_data()
+
+# Sidebar controls 
+
+with st.sidebar:
+    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Color_icon_green.svg/120px-Color_icon_green.svg.png", width=60)
+    st.title("Dashboard Controls")
+    st.markdown("---")
+
+    # Year selector
+    st.subheader("📅 Select Year")
+    available_years = sorted(df["Year"].unique())
+    selected_year = st.slider(
+        "Year",
+        min_value=int(min(available_years)),
+        max_value=int(max(available_years)),
+        value=2020,
+        step=1,
+        label_visibility="collapsed"
+    )
+
+    st.markdown("---")
+
+    # Country selector for time series
+    st.subheader("🌍 Countries for Time Series")
+    all_countries = sorted(df["Country Name"].unique())
+    default_countries = ["United Kingdom", "United States", "China", "India", "Germany", "Singapore"]
+    
+    valid_defaults = [c for c in default_countries if c in all_countries]
+    selected_countries = st.multiselect(
+        "Select Countries",
+        options=all_countries,
+        default=valid_defaults,
+        label_visibility="collapsed"
+    )
+
+    st.markdown("---")
+
+    # N selector for bar charts
+    st.subheader("🔢 Top/Bottom N Countries")
+    top_n = st.slider("N countries to show", 5, 20, 10, label_visibility="collapsed")
+
+    st.markdown("---")
+    st.caption("📊 Data: World Bank Open Data")
+    st.caption("📌 Indicator: NY.ADJ.SVNG.GN.ZS")
+    st.caption("🗓️ Coverage: 266 economies, 1990–2021")
+
+# Main Header 
+
+st.markdown('<p class="main-header">🌍 Global Sustainability Dashboard</p>', unsafe_allow_html=True)
+st.markdown(
+    '<p class="sub-header">Adjusted Net Savings Including Particulate Emission Damage (% of GNI) — '
+    'World Bank | Is the world building or depleting its genuine wealth?</p>',
+    unsafe_allow_html=True
+)
+st.markdown("---")
+
+# Section 1 — KPI Cards
+
+year_data = df[df["Year"] == selected_year].copy()
+global_avg = year_data["ANS"].mean()
+negative_count = (year_data["ANS"] < 0).sum()
+positive_count = (year_data["ANS"] >= 0).sum()
+country_count = len(year_data)
+negative_pct = (negative_count / country_count * 100) if country_count > 0 else 0
+
+col1, col2, col3, col4, col5 = st.columns(5)
+
+with col1:
+    st.metric(
+        label="📅 Selected Year",
+        value=str(selected_year)
+    )
+with col2:
+    st.metric(
+        label="🌐 Global Average ANS",
+        value=f"{global_avg:.2f}%",
+        delta=f"vs 0% threshold"
+    )
+with col3:
+    st.metric(
+        label="✅ Wealth-Building Nations",
+        value=str(positive_count),
+        delta=f"{100 - negative_pct:.1f}% of total"
+    )
+with col4:
+    st.metric(
+        label="⚠️ Wealth-Depleting Nations",
+        value=str(negative_count),
+        delta=f"-{negative_pct:.1f}% of total",
+        delta_color="inverse"
+    )
+with col5:
+    st.metric(
+        label="🗺️ Countries with Data",
+        value=str(country_count)
+    )
+
+st.markdown("---")
