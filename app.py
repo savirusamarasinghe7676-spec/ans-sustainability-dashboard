@@ -244,3 +244,56 @@ st.markdown(
 )
 
 st.markdown("---")
+
+# Section 3 — Line Chart (Time Series)
+
+st.subheader("📈 Visualisation 2: ANS Trends Over Time (1990–2021)")
+
+if not selected_countries:
+    st.markdown(
+        '<div class="warning-box">⚠️ Please select at least one country from the sidebar to display the time series chart.</div>',
+        unsafe_allow_html=True
+    )
+else:
+    ts_data = df[
+        (df["Country Name"].isin(selected_countries)) &
+        (df["Year"] >= 1990) &
+        (df["Year"] <= 2021)
+    ].copy()
+
+    if ts_data.empty:
+        st.warning("No data available for the selected countries in this time range.")
+    else:
+        fig_line = px.line(
+            ts_data,
+            x="Year",
+            y="ANS",
+            color="Country Name",
+            title="Adjusted Net Savings Trends by Country (1990–2021)",
+            labels={"ANS": "ANS (% of GNI)", "Country Name": "Country"},
+            markers=True
+        )
+        fig_line.add_hline(
+            y=0,
+            line_dash="dash",
+            line_color="red",
+            line_width=2,
+            annotation_text="Break-Even Threshold (0%)",
+            annotation_position="bottom right"
+        )
+        fig_line.update_layout(
+            height=480,
+            hovermode="x unified",
+            legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5)
+        )
+        fig_line.update_traces(line=dict(width=2.5))
+        st.plotly_chart(fig_line, width='stretch')
+
+        st.markdown(
+            '<div class="insight-box">🔍 <b>Key Insight:</b> Countries that fall below the red dashed line are '
+            'depleting their national wealth. The UK dipped close to zero after 2008. China and India show '
+            'strong positive trends — consistent investment in human capital drives high ANS scores.</div>',
+            unsafe_allow_html=True
+        )
+
+st.markdown("---")
