@@ -297,3 +297,63 @@ else:
         )
 
 st.markdown("---")
+
+# Section 4 — Top & Bottom Bar Charts 
+
+st.subheader(f"📊 Visualisation 3: Top & Bottom {top_n} Countries — {selected_year}")
+
+col_top, col_bot = st.columns(2)
+
+with col_top:
+    top_data = year_data.nlargest(top_n, "ANS").sort_values("ANS")
+    fig_top = px.bar(
+        top_data,
+        x="ANS",
+        y="Country Name",
+        orientation="h",
+        color="ANS",
+        color_continuous_scale="Greens",
+        title=f"🏆 Top {top_n} — Highest ANS ({selected_year})",
+        labels={"ANS": "ANS (% of GNI)", "Country Name": ""},
+        text="ANS"
+    )
+    fig_top.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
+    fig_top.update_layout(
+        height=420,
+        showlegend=False,
+        coloraxis_showscale=False,
+        margin=dict(l=0, r=60, t=40, b=0)
+    )
+    st.plotly_chart(fig_top, width='stretch')
+
+with col_bot:
+    bot_data = year_data.nsmallest(top_n, "ANS").sort_values("ANS", ascending=False)
+    fig_bot = px.bar(
+        bot_data,
+        x="ANS",
+        y="Country Name",
+        orientation="h",
+        color="ANS",
+        color_continuous_scale="Reds_r",
+        title=f"⚠️ Bottom {top_n} — Lowest ANS ({selected_year})",
+        labels={"ANS": "ANS (% of GNI)", "Country Name": ""},
+        text="ANS"
+    )
+    fig_bot.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
+    fig_bot.update_layout(
+        height=420,
+        showlegend=False,
+        coloraxis_showscale=False,
+        margin=dict(l=0, r=60, t=40, b=0)
+    )
+    st.plotly_chart(fig_bot, width='stretch')
+
+st.markdown(
+    '<div class="insight-box">🔍 <b>Key Insight:</b> Congo consistently ranks among the most '
+    'negative — it extracts vast mineral and oil wealth but fails to convert it into human capital. '
+    'Singapore and Bangladesh consistently lead — no natural resources, but huge investment in education '
+    'and clean infrastructure. This reveals the <b>"resource curse"</b> vs <b>"human capital miracle"</b> divide.</div>',
+    unsafe_allow_html=True
+)
+
+st.markdown("---")
