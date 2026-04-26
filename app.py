@@ -408,3 +408,61 @@ with col_box:
     st.plotly_chart(fig_box, width='stretch')
 
 st.markdown("---")
+
+# Section 6 —  Area Chart (Global Trend Over Time)
+
+st.subheader("🌐 Visualisation 5: Global Average ANS Trend (1990–2021)")
+
+global_trend = df[(df["Year"] >= 1990) & (df["Year"] <= 2021)].groupby("Year").agg(
+    Global_Avg=("ANS", "mean"),
+    Negative_Count=("ANS", lambda x: (x < 0).sum()),
+    Total_Countries=("ANS", "count")
+).reset_index()
+global_trend["Negative_Pct"] = (global_trend["Negative_Count"] / global_trend["Total_Countries"] * 100).round(1)
+
+col_trend, col_neg = st.columns(2)
+
+with col_trend:
+    fig_trend = go.Figure()
+    fig_trend.add_trace(go.Scatter(
+        x=global_trend["Year"],
+        y=global_trend["Global_Avg"],
+        fill="tozeroy",
+        fillcolor="rgba(39, 174, 96, 0.2)",
+        line=dict(color="#27ae60", width=3),
+        name="Global Average ANS",
+        hovertemplate="Year: %{x}<br>Global Avg ANS: %{y:.2f}%<extra></extra>"
+    ))
+    fig_trend.add_hline(y=0, line_dash="dash", line_color="red", line_width=1.5)
+    fig_trend.update_layout(
+        title="Global Average ANS Over Time",
+        xaxis_title="Year",
+        yaxis_title="ANS (% of GNI)",
+        height=380,
+        showlegend=False
+    )
+    st.plotly_chart(fig_trend, width='stretch')
+
+with col_neg:
+    fig_neg = px.bar(
+        global_trend,
+        x="Year",
+        y="Negative_Count",
+        color="Negative_Count",
+        color_continuous_scale="Reds",
+        title="Number of Countries with Negative ANS Per Year",
+        labels={"Negative_Count": "Countries with ANS < 0", "Year": "Year"}
+    )
+    fig_neg.update_layout(height=380, showlegend=False, coloraxis_showscale=False)
+    st.plotly_chart(fig_neg, width='stretch')
+
+st.markdown(
+    '<div class="insight-box">🔍 <b>Key Insight:</b> The global average ANS improved from '
+    '6.0% in 2000 to a peak of 10.4% in 2019, before dipping in 2020 — likely due to COVID-19 '
+    'impacts on education investment and economic output. The number of wealth-depleting nations '
+    'has declined from 38 countries in 2000 to 23 in 2020, showing overall progress — but 23 '
+    'nations still consuming more than they create.</div>',
+    unsafe_allow_html=True
+)
+
+st.markdown("---")
