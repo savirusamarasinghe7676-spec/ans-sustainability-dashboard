@@ -357,3 +357,54 @@ st.markdown(
 )
 
 st.markdown("---")
+
+# Section 5 — Distribution Chaets (Histogram and Box Plot)
+
+st.subheader(f"📉 Visualisation 4: Statistical Distribution of ANS")
+
+col_hist, col_box = st.columns(2)
+
+with col_hist:
+    fig_hist = px.histogram(
+        year_data,
+        x="ANS",
+        nbins=35,
+        color="Status",
+        color_discrete_map={
+            "Positive (Wealth Building)": "#27ae60",
+            "Negative (Wealth Depleting)": "#e74c3c"
+        },
+        title=f"Distribution of ANS Across All Countries ({selected_year})",
+        labels={"ANS": "ANS (% of GNI)", "count": "Number of Countries"}
+    )
+    fig_hist.add_vline(
+        x=0, line_dash="dash", line_color="black", line_width=2,
+        annotation_text="0% threshold", annotation_position="top"
+    )
+    fig_hist.add_vline(
+        x=global_avg, line_dash="dot", line_color="#2980b9", line_width=2,
+        annotation_text=f"Global avg: {global_avg:.1f}%", annotation_position="top right"
+    )
+    fig_hist.update_layout(height=380, bargap=0.05)
+    st.plotly_chart(fig_hist, width='stretch')
+
+with col_box:
+    # Compare selected decade snapshots
+    decade_years = [yr for yr in [2000, 2005, 2010, 2015, 2020] if yr in df["Year"].values]
+    decade_data = df[df["Year"].isin(decade_years)].copy()
+    decade_data["Year"] = decade_data["Year"].astype(str)
+
+    fig_box = px.box(
+        decade_data,
+        x="Year",
+        y="ANS",
+        color="Year",
+        title="ANS Distribution Across Key Years",
+        labels={"ANS": "ANS (% of GNI)"},
+        points="outliers"
+    )
+    fig_box.add_hline(y=0, line_dash="dash", line_color="red", line_width=2)
+    fig_box.update_layout(height=380, showlegend=False)
+    st.plotly_chart(fig_box, width='stretch')
+
+st.markdown("---")
