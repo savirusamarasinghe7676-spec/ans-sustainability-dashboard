@@ -466,3 +466,56 @@ st.markdown(
 )
 
 st.markdown("---")
+
+# SECTION 7 — Searchable Data Table 
+
+st.subheader(f"🔍 Data Explorer — All Countries ({selected_year})")
+
+col_filter, col_sort = st.columns([3, 1])
+with col_filter:
+    search_term = st.text_input("Search for a country:", placeholder="Type a country name...")
+with col_sort:
+    sort_order = st.selectbox("Sort by:", ["Highest ANS first", "Lowest ANS first", "Alphabetical"])
+
+# Apply filters
+display_df = year_data[["Country Name", "Country Code", "ANS", "Status"]].copy()
+display_df.columns = ["Country", "Code", "ANS (% of GNI)", "Status"]
+
+if search_term:
+    display_df = display_df[display_df["Country"].str.contains(search_term, case=False, na=False)]
+
+if sort_order == "Highest ANS first":
+    display_df = display_df.sort_values("ANS (% of GNI)", ascending=False)
+elif sort_order == "Lowest ANS first":
+    display_df = display_df.sort_values("ANS (% of GNI)", ascending=True)
+else:
+    display_df = display_df.sort_values("Country")
+
+display_df = display_df.reset_index(drop=True)
+
+st.dataframe(
+    display_df,
+    width='stretch',
+    height=350,
+    column_config={
+        "ANS (% of GNI)": st.column_config.NumberColumn(format="%.2f%%"),
+        "Status": st.column_config.TextColumn()
+    }
+)
+
+st.caption(f"Showing {len(display_df)} of {country_count} countries with data for {selected_year}")
+
+st.markdown("---")
+
+# Footer 
+
+st.markdown(
+    """
+    <div style='text-align: center; color: #888; font-size: 0.8rem; padding: 1rem;'>
+    📊 Data Source: <a href='https://data.worldbank.org/indicator/NY.ADJ.SVNG.GN.ZS' target='_blank'>World Bank Open Data</a> |
+    Indicator: NY.ADJ.SVNG.GN.ZS | Coverage: 266 economies, 1960–2025 |
+    Dashboard developed for 5DATA004C Data Science Project Lifecycle — University of Westminster
+    </div>
+    """,
+    unsafe_allow_html=True
+)
