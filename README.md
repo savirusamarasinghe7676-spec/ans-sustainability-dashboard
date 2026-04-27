@@ -1,4 +1,6 @@
 # Global Sustainability Dashboard - Adjusted Net Savings
+# Authoer: Saviru Samarasinghe 
+# Dataset: World Bank Open Data ((Adjusted net savings, including particulate emission damage (% of GNI))
 
 This is my project for the 5DATA004C Data Science Project Lifecycle module at the University of Westminster. 
 
